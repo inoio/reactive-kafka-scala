@@ -12,7 +12,7 @@ import org.reactivestreams.Publisher
 /**
  * Responsible for starting the writing stream.
  */
-class KafkaWriterCoordinator(mat: Materializer, topicName: String) extends Actor with ActorLogging {
+class KafkaWriterCoordinator(mat: Materializer, topicName: String, kafkaIp: String) extends Actor with ActorLogging {
 
   implicit lazy val materializer = mat
 
@@ -38,7 +38,7 @@ class KafkaWriterCoordinator(mat: Materializer, topicName: String) extends Actor
 
   def initWriter(): Unit = {
     val actorProps = new ReactiveKafka().producerActorProps(ProducerProperties(
-      brokerList = sys.env("INOIO_KAFKA_IP"),
+      brokerList = kafkaIp,
       topic = topicName,
       encoder = CurrencyRateUpdatedEncoder
     ))

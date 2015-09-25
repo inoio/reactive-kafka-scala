@@ -7,6 +7,7 @@ version := "1.0"
 scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
+  "org.scalaz" %% "scalaz-core" % "7.1.4",
   "com.softwaremill.reactivekafka" %% "reactive-kafka-core" % "0.8.1",
   "ch.qos.logback" % "logback-classic" % "1.1.3",
   "org.slf4j" % "log4j-over-slf4j" % "1.7.12",

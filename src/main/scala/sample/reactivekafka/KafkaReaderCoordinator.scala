@@ -11,7 +11,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.math.BigDecimal.RoundingMode
 
-class KafkaReaderCoordinator(mat: Materializer, topicName: String) extends Actor with ActorLogging {
+class KafkaReaderCoordinator(mat: Materializer, topicName: String, kafkaIp: String, zkIp: String) extends Actor with ActorLogging {
 
   implicit val materializer = mat
   var consumerWithOffsetSink: PublisherWithCommitSink[CurrencyRateUpdated] = _
@@ -32,8 +32,8 @@ class KafkaReaderCoordinator(mat: Materializer, topicName: String) extends Actor
   def initReader(): Unit = {
     implicit val actorSystem = context.system
     consumerWithOffsetSink = new ReactiveKafka().consumeWithOffsetSink(ConsumerProperties(
-      brokerList = sys.env("INOIO_KAFKA_IP"),
-      zooKeeperHost = sys.env("INOIO_ZK_IP"),
+      brokerList = kafkaIp,
+      zooKeeperHost = zkIp,
       topic = topicName,
       "group",
       CurrencyRateUpdatedDecoder

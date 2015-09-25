@@ -8,7 +8,7 @@ import akka.stream.ActorMaterializer
 import scala.language.postfixOps
 import scala.concurrent.duration._
 
-class Coordinator extends Actor with ActorLogging {
+class Coordinator(kafkaIp: String, zkIp: String) extends Actor with ActorLogging {
 
   val topicName = UUID.randomUUID().toString
   var writer: Option[ActorRef] = None
@@ -20,9 +20,10 @@ class Coordinator extends Actor with ActorLogging {
   override def receive: Receive = {
     case "Start" =>
       log.debug("Starting the coordinator")
-      writer = Some(context.actorOf(Props(new KafkaWriterCoordinator(materializer, topicName))))
-      reader = Some(context.actorOf(Props(new KafkaReaderCoordinator(materializer, topicName))))
+      writer = Some(context.actorOf(Props(new KafkaWriterCoordinator(materializer, topicName, kafkaIp))))
+      reader = Some(context.actorOf(Props(new KafkaReaderCoordinator(materializer, topicName, kafkaIp, zkIp))))
     case "Reader initialized" =>
+      log.debug("Reader initialized")
       context.system.scheduler.scheduleOnce(5 seconds, self, "Stop")
     case "Stop" =>
       log.debug("Stopping the coordinator")
@@ -34,3 +35,4 @@ class Coordinator extends Actor with ActorLogging {
       context.system.shutdown()
   }
 }
+
