@@ -5,7 +5,6 @@ import scalaz.std.option._
 import scalaz.syntax.std.option._
 
 trait CommandLineParser {
-  import Mode._
   val commandLineParser = new scopt.OptionParser[Config]("reactivekafka") {
     head("reactivekafka", "0.0.1")
     opt[String]("kafka") text ("Kafka IP") action { (ip, config) => config.copy(kafkaIp = ip) }
@@ -16,10 +15,7 @@ trait CommandLineParser {
 
     note(
       """
-        |Consume feeds and get a listing of all urls
-        |
-        |If no option is given the feed will be consumed along the prev headers.
-        |Turning searching on, will use GET requests, otherwise HEAD requests.
+        |Read or write sample data to a Kafka instance
       """.stripMargin)
   }
 }
@@ -27,7 +23,7 @@ trait CommandLineParser {
 sealed trait Mode
 object Mode {
   implicit val modeRead: scopt.Read[Mode] =
-    scopt.Read.reads(s => parse(s).get)
+    scopt.Read.reads(s => parse(s).getOrElse(throw new IllegalArgumentException(s"""Mode needs to be one of ${values.mkString(", ")}""")))
   private val values = List(read, write, readwrite)
   def parse(str: String): Option[Mode] = values.find(v => v.toString == str)
   case object read extends Mode
