@@ -6,6 +6,8 @@ version := "1.0"
 
 scalaVersion := "2.11.7"
 
+enablePlugins(JavaAppPackaging)
+
 libraryDependencies ++= Seq(
   "org.scalaz" %% "scalaz-core" % "7.1.4",
   "com.softwaremill.reactivekafka" %% "reactive-kafka-core" % "0.8.1",
