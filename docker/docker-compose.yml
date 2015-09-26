@@ -5,10 +5,21 @@ zookeeper:
 kafka:
   build: .
   ports:
-    - "9092:9092"
+    - "9092"
   links: 
     - zookeeper:zk
   environment:
     KAFKA_ADVERTISED_HOST_NAME: 192.168.59.103
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
+
+kafkamanager:
+  image: dockerkafka/kafka-manager
+  ports:
+    - "9000:9000"
+  links:
+    - zookeeper:zk
+  environment:
+    - ZK_HOSTS=zk:2181
+    
+  
