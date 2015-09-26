@@ -12,7 +12,7 @@ import org.reactivestreams.Publisher
 /**
  * Responsible for starting the writing stream.
  */
-class KafkaWriterCoordinator(mat: Materializer, topicName: String, kafkaIp: String) extends Actor with ActorLogging {
+class KafkaWriterCoordinator(mat: Materializer, config: Config) extends Actor with ActorLogging {
 
   implicit lazy val materializer = mat
 
@@ -21,7 +21,7 @@ class KafkaWriterCoordinator(mat: Materializer, topicName: String, kafkaIp: Stri
   override def supervisorStrategy: SupervisorStrategy = OneForOneStrategy() {
     case e: Exception =>
       // here you can handle your failing Kafka writes
-      log.error("Write failed!")
+      log.error(s"Write failed! ${e}")
       Resume
   }
 
@@ -37,14 +37,16 @@ class KafkaWriterCoordinator(mat: Materializer, topicName: String, kafkaIp: Stri
   }
 
   def initWriter(): Unit = {
+    log.debug(s"Config : $config")
     val actorProps = new ReactiveKafka().producerActorProps(ProducerProperties(
-      brokerList = kafkaIp,
-      topic = topicName,
+      brokerList = config.kafkaIp,
+      topic = config.topic.get,
       encoder = CurrencyRateUpdatedEncoder
     ))
     val actor = context.actorOf(actorProps)
     subscriberActor = Some(actor)
     val generatorActor = context.actorOf(Props(new CurrencyRatePublisher))
+    context.parent ! "Writer initialized"
 
     // Start the stream
     val publisher: Publisher[CurrencyRateUpdated] = ActorPublisher[CurrencyRateUpdated](generatorActor)
