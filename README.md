@@ -45,7 +45,23 @@ direnv allow .
 ### start sample
 
 ```
-sbt run
+sbt stage
+
+reactive-kafka-scala 0.0.1
+Usage: reactive-kafka-scala [options]
+
+  --kafka <value>
+        Kafka IP
+  --zk <value>
+        Zookeper IP
+  --topic <value>
+        topic
+  --group <value>
+        group
+  --mode <value>
+        mode
+
+Read or write sample data to a Kafka instance
 ```
 
 

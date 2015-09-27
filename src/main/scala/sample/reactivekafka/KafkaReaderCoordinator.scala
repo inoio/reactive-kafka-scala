@@ -6,10 +6,10 @@ import akka.stream.{ Supervision, ActorAttributes, Materializer }
 import akka.stream.scaladsl.Source
 import com.softwaremill.react.kafka.{ ConsumerProperties, PublisherWithCommitSink, ReactiveKafka }
 import kafka.message.MessageAndMetadata
-
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.math.BigDecimal.RoundingMode
+import akka.event.LoggingReceive
 
 class KafkaReaderCoordinator(mat: Materializer, config: Config) extends Actor with ActorLogging {
 
@@ -25,18 +25,19 @@ class KafkaReaderCoordinator(mat: Materializer, config: Config) extends Actor wi
     case e: Exception => log.error(e, "Error when processing exchange rates"); Resume
   }
 
-  override def receive: Receive = {
+  override def receive: Receive = LoggingReceive {
     case _ =>
   }
 
   def initReader(): Unit = {
+    log.debug("initReader")
     implicit val actorSystem = context.system
     consumerWithOffsetSink = new ReactiveKafka().consumeWithOffsetSink(ConsumerProperties(
       brokerList = config.kafkaIp,
       zooKeeperHost = config.zkIp,
       topic = config.topic.get,
       groupId = config.group.getOrElse("group"),
-      Encoder.decoder[CurrencyRateUpdated]
+      decoder = Encoder.decoder[CurrencyRateUpdated]
     )
       .kafkaOffsetsStorage()
       .commitInterval(1200 milliseconds)
@@ -51,6 +52,7 @@ class KafkaReaderCoordinator(mat: Materializer, config: Config) extends Actor wi
 
   def processMessage(msg: MessageAndMetadata[Array[Byte], CurrencyRateUpdated]) = {
     val pairAndRate = msg.message()
+    print("+")
     if (alertTriggered(pairAndRate.percentUpdate))
       log.info(s"Exchange rate for ${pairAndRate.base}/${pairAndRate.counter} changed by ${pairAndRate.percentUpdate}%!")
     msg

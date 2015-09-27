@@ -13,8 +13,9 @@ class CurrencyRatePublisher extends ActorPublisher[CurrencyRateUpdated] with Act
 
   def sendRates(): Unit = {
     while (isActive && totalDemand > 0) {
+      print(".")
       onNext(RandomCurrencyRateChangeGenerator.randomPair())
-      // Thread.sleep(300)
+      Thread.sleep(300)
     }
   }
 }

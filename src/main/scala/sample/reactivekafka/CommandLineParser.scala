@@ -5,8 +5,8 @@ import scalaz.std.option._
 import scalaz.syntax.std.option._
 
 trait CommandLineParser {
-  val commandLineParser = new scopt.OptionParser[Config]("reactivekafka") {
-    head("reactivekafka", "0.0.1")
+  val commandLineParser = new scopt.OptionParser[Config]("reactive-kafka-scala") {
+    head("reactive-kafka-scala", "0.0.1")
     opt[String]("kafka") text ("Kafka IP") action { (ip, config) => config.copy(kafkaIp = ip) }
     opt[String]("zk") text ("Zookeper IP") action { (ip, config) => config.copy(zkIp = ip) }
     opt[String]("topic") text ("topic") action { (t, config) => config.copy(topic = t.some) }

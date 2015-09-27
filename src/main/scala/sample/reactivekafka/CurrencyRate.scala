@@ -17,7 +17,9 @@ trait EncoderInstances {
   }
 
   implicit def decoder[A](implicit R: Reads[A]): Decoder[A] = new Decoder[A] {
-    override def fromBytes(bytes: Array[Byte]): A = Json.parse(bytes).as[A]
+    override def fromBytes(bytes: Array[Byte]): A = {
+      Json.parse(bytes).as[A]
+    }
   }
 
 }

@@ -8,6 +8,7 @@ import akka.stream.actor.{ ActorPublisher, ActorSubscriber }
 import akka.stream.scaladsl.{ Sink, Source }
 import com.softwaremill.react.kafka.{ ProducerProperties, ReactiveKafka }
 import org.reactivestreams.Publisher
+import akka.event.LoggingReceive
 
 /**
  * Responsible for starting the writing stream.
@@ -30,7 +31,7 @@ class KafkaWriterCoordinator(mat: Materializer, config: Config) extends Actor wi
     initWriter()
   }
 
-  override def receive: Receive = {
+  override def receive: Receive = LoggingReceive {
     case "Stop" =>
       log.debug("Stopping the writer coordinator")
       subscriberActor.foreach(actor => actor ! OnComplete)
