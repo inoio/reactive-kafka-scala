@@ -21,5 +21,5 @@ kafkamanager:
     - zookeeper:zk
   environment:
     - ZK_HOSTS=zk:2181
-    
+    - KM_VERSION=master
   
