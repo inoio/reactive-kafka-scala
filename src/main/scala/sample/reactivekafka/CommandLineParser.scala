@@ -21,15 +21,21 @@ trait CommandLineParser {
 }
 
 sealed trait Mode
+
 object Mode {
+
   implicit val modeRead: scopt.Read[Mode] =
     scopt.Read.reads(s => parse(s).getOrElse(throw new IllegalArgumentException(s"""Mode needs to be one of ${values.mkString(", ")}""")))
+
   private val values = List(read, write, readwrite)
+
   def parse(str: String): Option[Mode] = values.find(v => v.toString == str)
+
   case object read extends Mode
   case object write extends Mode
   case object readwrite extends Mode
 }
+
 case class Config(
   kafkaIp: String = sys.env.get("INOIO_KAFKA_IP").getOrElse(""),
   zkIp: String = sys.env.get("INOIO_ZK_IP").getOrElse(""),

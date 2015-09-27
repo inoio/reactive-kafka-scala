@@ -13,7 +13,7 @@ import org.reactivestreams.Publisher
  * Responsible for starting the writing stream.
  */
 class KafkaWriterCoordinator(mat: Materializer, config: Config) extends Actor with ActorLogging {
-
+  import CurrencyRateUpdated._
   implicit lazy val materializer = mat
 
   var subscriberActor: Option[ActorRef] = None
@@ -41,7 +41,7 @@ class KafkaWriterCoordinator(mat: Materializer, config: Config) extends Actor wi
     val actorProps = new ReactiveKafka().producerActorProps(ProducerProperties(
       brokerList = config.kafkaIp,
       topic = config.topic.get,
-      encoder = CurrencyRateUpdatedEncoder
+      encoder = Encoder.encoder[CurrencyRateUpdated]
     ))
     val actor = context.actorOf(actorProps)
     subscriberActor = Some(actor)
