@@ -37,11 +37,10 @@ class KafkaReaderCoordinator(mat: Materializer, config: Config) extends Actor wi
       zooKeeperHost = config.zkIp,
       topic = config.topic.get,
       groupId = config.group.getOrElse("group"),
-      decoder = Encoder.decoder[CurrencyRateUpdated]
+      decoder = Decoder.decoder[CurrencyRateUpdated]
     )
       .kafkaOffsetsStorage()
-      .commitInterval(1200 milliseconds)
-    )
+      .commitInterval(1200 milliseconds))
     log.debug("Starting the reader")
     Source(consumerWithOffsetSink.publisher)
       .map(processMessage)

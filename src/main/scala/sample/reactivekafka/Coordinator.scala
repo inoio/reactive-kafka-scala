@@ -1,7 +1,5 @@
 package sample.reactivekafka
 
-import java.util.{ Properties, UUID }
-
 import akka.actor._
 import akka.stream.ActorMaterializer
 
@@ -50,4 +48,3 @@ class Coordinator(config: Config) extends Actor with ActorLogging {
       context.system.shutdown()
   }
 }
-

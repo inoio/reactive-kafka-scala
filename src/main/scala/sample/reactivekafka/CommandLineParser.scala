@@ -16,7 +16,8 @@ trait CommandLineParser {
     note(
       """
         |Read or write sample data to a Kafka instance
-      """.stripMargin)
+      """.stripMargin
+    )
   }
 }
 
@@ -41,4 +42,5 @@ case class Config(
   zkIp: String = sys.env.get("INOIO_ZK_IP").getOrElse(""),
   topic: Option[String] = java.util.UUID.randomUUID().toString.some,
   group: Option[String] = none,
-  mode: Mode = Mode.readwrite)
+  mode: Mode = Mode.readwrite
+)

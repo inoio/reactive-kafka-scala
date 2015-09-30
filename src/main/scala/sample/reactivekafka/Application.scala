@@ -1,13 +1,11 @@
 package sample.reactivekafka
 
 import akka.actor.{ ActorSystem, Props }
-import scalaz._
-import Scalaz._
 
 object Application extends App with CommandLineParser {
 
   commandLineParser.parse(args, Config()) map { config =>
-    implicit val system = ActorSystem("CurrencyWatcher")
+    val system = ActorSystem("CurrencyWatcher")
     println(s"""
                   |Starting Kafka with:
                   |INOIO_KAFKA_IP : ${config.kafkaIp}
@@ -15,5 +13,4 @@ object Application extends App with CommandLineParser {
     val coordinator = system.actorOf(Props(new Coordinator(config)))
     coordinator ! "Start"
   }
-
 }
