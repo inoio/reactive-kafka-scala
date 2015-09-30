@@ -12,7 +12,7 @@ import scalaz.syntax.std.option._
 
 class Coordinator(config: Config) extends Actor with ActorLogging {
 
-  val topicName = config.topic.getOrElse(UUID.randomUUID().toString)
+  val topicName = config.topic.get
   var writer: Option[ActorRef] = None
   var reader: Option[ActorRef] = None
   val materializer = ActorMaterializer()(context)

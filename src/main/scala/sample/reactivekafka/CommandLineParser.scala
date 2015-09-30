@@ -39,6 +39,6 @@ object Mode {
 case class Config(
   kafkaIp: String = sys.env.get("INOIO_KAFKA_IP").getOrElse(""),
   zkIp: String = sys.env.get("INOIO_ZK_IP").getOrElse(""),
-  topic: Option[String] = none,
+  topic: Option[String] = java.util.UUID.randomUUID().toString.some,
   group: Option[String] = none,
   mode: Mode = Mode.readwrite)
