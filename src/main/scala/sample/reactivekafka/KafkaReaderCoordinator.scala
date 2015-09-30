@@ -51,13 +51,10 @@ class KafkaReaderCoordinator(mat: Materializer, config: Config) extends Actor wi
 
   def processMessage(msg: MessageAndMetadata[Array[Byte], CurrencyRateUpdated]) = {
     val pairAndRate = msg.message()
-    print("+")
-    if (alertTriggered(pairAndRate.percentUpdate))
-      log.info(s"Exchange rate for ${pairAndRate.base}/${pairAndRate.counter} changed by ${pairAndRate.percentUpdate}%!")
+    log.info(s"Offset: ${msg.offset}")
+    log.info(s"Msg   : ${pairAndRate}")
     msg
   }
-
-  def alertTriggered(update: BigDecimal): Boolean = update.abs > 3
 
   override def postStop(): Unit = {
     consumerWithOffsetSink.cancel()
