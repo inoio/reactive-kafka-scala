@@ -13,7 +13,7 @@ class CurrencyRateUpdatedSpec extends FlatSpec with Matchers {
 
     // when
     val bytes = Encoder.encoder[CurrencyRateUpdated].toBytes(initialRate)
-    val resultRate = Encoder.decoder[CurrencyRateUpdated].fromBytes(bytes)
+    val resultRate = Decoder.decoder[CurrencyRateUpdated].fromBytes(bytes)
 
     // then
     resultRate should equal(initialRate)

@@ -22,7 +22,9 @@ class KafkaReaderCoordinator(mat: Materializer, config: Config) extends Actor wi
   }
 
   val processingDecider: Supervision.Decider = {
-    case e: Exception => log.error(e, "Error when processing exchange rates"); Resume
+    case e: Exception =>
+      log.error(e, "Error when processing exchange rates")
+      Resume
   }
 
   override def receive: Receive = LoggingReceive {

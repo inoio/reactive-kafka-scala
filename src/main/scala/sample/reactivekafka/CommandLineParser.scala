@@ -12,6 +12,8 @@ trait CommandLineParser {
     opt[String]("topic") text ("topic") action { (t, config) => config.copy(topic = t.some) }
     opt[String]("group") text ("group") action { (g, config) => config.copy(group = g.some) }
     opt[Mode]("mode") text ("mode") action { (m, config) => config.copy(mode = m) }
+    opt[String]("msg") text ("msg to send to the Coordinator") action { (m, config) => config.copy(msg = m) }
+    help("help")
 
     note(
       """
@@ -42,5 +44,6 @@ case class Config(
   zkIp: String = sys.env.get("INOIO_ZK_IP").getOrElse(""),
   topic: Option[String] = java.util.UUID.randomUUID().toString.some,
   group: Option[String] = none,
-  mode: Mode = Mode.readwrite
+  mode: Mode = Mode.readwrite,
+  msg: String = "Start"
 )

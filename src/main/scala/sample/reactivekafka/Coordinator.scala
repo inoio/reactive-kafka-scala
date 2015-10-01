@@ -10,28 +10,36 @@ import scalaz.syntax.std.option._
 
 class Coordinator(config: Config) extends Actor with ActorLogging {
 
+  import Coordinator._
+
   val topicName = config.topic.get
-  var writer: Option[ActorRef] = None
-  var reader: Option[ActorRef] = None
+  var writer: Option[ActorRef] = none
+  var reader: Option[ActorRef] = none
   val materializer = ActorMaterializer()(context)
 
   implicit val ec = context.dispatcher
 
   override def receive: Receive = {
-    case "Start" =>
-      log.debug(s"Starting the coordinator in mode ${config.mode}")
-      config.mode match {
+    case msg @ InitialMessage("Start", mode) =>
+      log.debug(s"Starting the coordinator with $msg")
+      mode match {
         case Mode.write | Mode.readwrite =>
           log.debug("Creating writer actor")
           writer = Some(context.actorOf(Props(new KafkaWriterCoordinator(materializer, config.copy(topic = topicName.some)))))
         case _ => writer = none
       }
-      config.mode match {
+      mode match {
         case Mode.read | Mode.readwrite =>
           log.debug("Creating reader actor")
           reader = Some(context.actorOf(Props(new KafkaReaderCoordinator(materializer, config.copy(topic = topicName.some)))))
         case _ => writer = none
       }
+
+    case msg: InitialMessage =>
+      log.error(s"Did not understand $msg")
+      log.error("Shutting down")
+      context.system.shutdown()
+
     case "Reader initialized" =>
       log.debug("Reader initialized")
       context.system.scheduler.scheduleOnce(5 seconds, self, "Stop")
@@ -47,4 +55,8 @@ class Coordinator(config: Config) extends Actor with ActorLogging {
       log.debug("Shutting down the app")
       context.system.shutdown()
   }
+}
+
+case object Coordinator {
+  case class InitialMessage(name: String, mode: Mode)
 }

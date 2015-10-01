@@ -11,6 +11,6 @@ object Application extends App with CommandLineParser {
                   |INOIO_KAFKA_IP : ${config.kafkaIp}
                   |INOIO_ZK_IP    : ${config.zkIp}""".stripMargin)
     val coordinator = system.actorOf(Props(new Coordinator(config)))
-    coordinator ! "Start"
+    coordinator ! Coordinator.InitialMessage(config.msg, config.mode)
   }
 }
