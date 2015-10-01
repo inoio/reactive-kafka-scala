@@ -38,10 +38,9 @@ class KafkaWriterCoordinator(mat: Materializer, config: Config) extends Actor wi
   }
 
   def initWriter(): Unit = {
-    log.debug(s"Config : $config")
     val actorProps = new ReactiveKafka().producerActorProps(ProducerProperties(
       brokerList = config.kafkaIp,
-      topic = config.topic.get,
+      topic = config.topic,
       encoder = Encoder.encoder[CurrencyRateUpdated]
     ))
     val actor = context.actorOf(actorProps)

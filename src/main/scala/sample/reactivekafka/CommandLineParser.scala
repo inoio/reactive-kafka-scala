@@ -9,8 +9,8 @@ trait CommandLineParser {
     head("reactive-kafka-scala", "0.0.1")
     opt[String]("kafka") text ("Kafka IP") action { (ip, config) => config.copy(kafkaIp = ip) }
     opt[String]("zk") text ("Zookeper IP") action { (ip, config) => config.copy(zkIp = ip) }
-    opt[String]("topic") text ("topic") action { (t, config) => config.copy(topic = t.some) }
-    opt[String]("group") text ("group") action { (g, config) => config.copy(group = g.some) }
+    opt[String]("topic") text ("topic") action { (t, config) => config.copy(topic = t) }
+    opt[String]("group") text ("group") action { (g, config) => config.copy(group = g) }
     opt[Mode]("mode") text ("mode") action { (m, config) => config.copy(mode = m) }
     opt[String]("msg") text ("msg to send to the Coordinator") action { (m, config) => config.copy(msg = m) }
     help("help")
@@ -40,10 +40,20 @@ object Mode {
 }
 
 case class Config(
-  kafkaIp: String = sys.env.get("INOIO_KAFKA_IP").getOrElse(""),
-  zkIp: String = sys.env.get("INOIO_ZK_IP").getOrElse(""),
-  topic: Option[String] = java.util.UUID.randomUUID().toString.some,
-  group: Option[String] = none,
-  mode: Mode = Mode.readwrite,
-  msg: String = "Start"
-)
+    kafkaIp: String = sys.env.get("INOIO_KAFKA_IP").getOrElse(""),
+    zkIp: String = sys.env.get("INOIO_ZK_IP").getOrElse(""),
+    topic: String = java.util.UUID.randomUUID().toString,
+    group: String = "group",
+    mode: Mode = Mode.readwrite,
+    msg: String = "Start"
+) {
+  override def toString(): String = s"""
+  | Config:
+  |   kafka     : $kafkaIp
+  |   zookeeper : $zkIp
+  |   topic     : $topic
+  |   group     : $group
+  |   mode      : $mode
+  |   msg       : $msg
+  """.stripMargin
+}

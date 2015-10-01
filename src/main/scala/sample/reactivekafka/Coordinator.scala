@@ -12,7 +12,7 @@ class Coordinator(config: Config) extends Actor with ActorLogging {
 
   import Coordinator._
 
-  val topicName = config.topic.get
+  val topicName = config.topic
   var writer: Option[ActorRef] = none
   var reader: Option[ActorRef] = none
   val materializer = ActorMaterializer()(context)
@@ -25,13 +25,13 @@ class Coordinator(config: Config) extends Actor with ActorLogging {
       mode match {
         case Mode.write | Mode.readwrite =>
           log.debug("Creating writer actor")
-          writer = Some(context.actorOf(Props(new KafkaWriterCoordinator(materializer, config.copy(topic = topicName.some)))))
+          writer = Some(context.actorOf(Props(new KafkaWriterCoordinator(materializer, config))))
         case _ => writer = none
       }
       mode match {
         case Mode.read | Mode.readwrite =>
           log.debug("Creating reader actor")
-          reader = Some(context.actorOf(Props(new KafkaReaderCoordinator(materializer, config.copy(topic = topicName.some)))))
+          reader = Some(context.actorOf(Props(new KafkaReaderCoordinator(materializer, config))))
         case _ => writer = none
       }
 

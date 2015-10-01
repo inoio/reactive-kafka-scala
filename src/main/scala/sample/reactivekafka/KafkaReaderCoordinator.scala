@@ -37,8 +37,8 @@ class KafkaReaderCoordinator(mat: Materializer, config: Config) extends Actor wi
     consumerWithOffsetSink = new ReactiveKafka().consumeWithOffsetSink(ConsumerProperties(
       brokerList = config.kafkaIp,
       zooKeeperHost = config.zkIp,
-      topic = config.topic.get,
-      groupId = config.group.getOrElse("group"),
+      topic = config.topic,
+      groupId = config.group,
       decoder = Decoder.decoder[CurrencyRateUpdated]
     )
       .kafkaOffsetsStorage()
