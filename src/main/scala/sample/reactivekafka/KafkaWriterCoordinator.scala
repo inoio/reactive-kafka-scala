@@ -17,7 +17,7 @@ class KafkaWriterCoordinator(mat: Materializer, config: Config) extends Actor wi
   import CurrencyRateUpdated._
   implicit lazy val materializer = mat
 
-  var subscriberActor: Option[ActorRef] = None
+  var maybeKafkaProducer: Option[ActorRef] = None
 
   override def supervisorStrategy: SupervisorStrategy = OneForOneStrategy() {
     case e: Exception =>
@@ -34,23 +34,24 @@ class KafkaWriterCoordinator(mat: Materializer, config: Config) extends Actor wi
   override def receive: Receive = LoggingReceive {
     case "Stop" =>
       log.debug("Stopping the writer coordinator")
-      subscriberActor.foreach(actor => actor ! OnComplete)
+      maybeKafkaProducer.foreach(actor => actor ! OnComplete)
   }
 
   def initWriter(): Unit = {
-    val actorProps = new ReactiveKafka().producerActorProps(ProducerProperties(
+    log.debug(s"Config : $config")
+    val kafkaProducerProps = new ReactiveKafka().producerActorProps(ProducerProperties(
       brokerList = config.kafkaIp,
       topic = config.topic,
       encoder = Encoder.encoder[CurrencyRateUpdated]
     ))
-    val actor = context.actorOf(actorProps)
-    subscriberActor = Some(actor)
+    val kafkaProducer = context.actorOf(kafkaProducerProps)
+    maybeKafkaProducer = Some(kafkaProducer)
     val generatorActor = context.actorOf(Props(new CurrencyRatePublisher))
     context.parent ! "Writer initialized"
 
     // Start the stream
     val publisher: Publisher[CurrencyRateUpdated] = ActorPublisher[CurrencyRateUpdated](generatorActor)
-    Source(publisher).runWith(Sink(ActorSubscriber[CurrencyRateUpdated](actor)))
+    Source(publisher).runWith(Sink(ActorSubscriber[CurrencyRateUpdated](kafkaProducer)))
   }
 
 }
