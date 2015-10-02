@@ -42,7 +42,8 @@ class KafkaReaderCoordinator(mat: Materializer, config: Config) extends Actor wi
       decoder = Decoder.decoder[CurrencyRateUpdated]
     )
       .kafkaOffsetsStorage()
-      .commitInterval(1200 milliseconds))
+      .commitInterval(100 milliseconds)
+      .readFromEndOfStream())
     log.debug("Starting the reader")
     Source(consumerWithOffsetSink.publisher)
       .map(processMessage)

@@ -42,15 +42,15 @@ class Coordinator(config: Config) extends Actor with ActorLogging {
 
     case "Reader initialized" =>
       log.debug("Reader initialized")
-      context.system.scheduler.scheduleOnce(5 seconds, self, "Stop")
+      context.system.scheduler.scheduleOnce(30 seconds, self, "Stop")
     case "Writer initialized" =>
       log.debug("Writer initialized")
-      context.system.scheduler.scheduleOnce(5 seconds, self, "Stop")
+      context.system.scheduler.scheduleOnce(30 seconds, self, "Stop")
     case "Stop" =>
       log.debug("Stopping the coordinator")
       writer.foreach(actor => actor ! "Stop")
       reader.foreach(actor => context.stop(actor))
-      context.system.scheduler.scheduleOnce(5 seconds, self, "Shutdown")
+      context.system.scheduler.scheduleOnce(30 seconds, self, "Shutdown")
     case "Shutdown" =>
       log.debug("Shutting down the app")
       context.system.shutdown()
