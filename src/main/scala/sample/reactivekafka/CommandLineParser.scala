@@ -47,8 +47,7 @@ case class Config(
     group: String = "group",
     mode: Mode = Mode.readwrite,
     msg: String = "Start",
-    props: Map[String, String] = Map.empty
-) {
+    props: Map[String, String] = Map.empty) {
   override def toString(): String = s"""
   | Config:
   |   kafka     : $kafkaIp

@@ -15,7 +15,7 @@ class Coordinator(config: Config) extends Actor with ActorLogging {
   val topicName = config.topic
   var writer: Option[ActorRef] = none
   var reader: Option[ActorRef] = none
-  val materializer = ActorMaterializer()(context)
+  lazy val materializer = ActorMaterializer()(context)
 
   implicit val ec = context.dispatcher
 
@@ -35,6 +35,18 @@ class Coordinator(config: Config) extends Actor with ActorLogging {
         case _ => writer = none
       }
 
+    case msg @ InitialMessage("numbers", mode) =>
+      log.debug(s"Starting the numbers coordinator with $msg")
+      mode match {
+        case Mode.write | Mode.readwrite =>
+          log.debug("Creating writer actor")
+          writer = Some(context.actorOf(NumberProducer.props(config)))
+        case Mode.read | Mode.readwrite =>
+          log.debug("Creating reader actor")
+          reader = Some(context.actorOf(NumberConsumer.props(config)))
+        case _ =>
+      }
+
     case msg: InitialMessage =>
       log.error(s"Did not understand $msg")
       log.error("Shutting down")
@@ -48,7 +60,7 @@ class Coordinator(config: Config) extends Actor with ActorLogging {
       context.system.scheduler.scheduleOnce(30 seconds, self, "Stop")
     case "Stop" =>
       log.debug("Stopping the coordinator")
-      writer.foreach(actor => actor ! "Stop")
+      writer.foreach(actor => context.stop(actor))
       reader.foreach(actor => context.stop(actor))
       context.system.scheduler.scheduleOnce(1 seconds, self, "Shutdown")
     case "Shutdown" =>

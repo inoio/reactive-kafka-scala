@@ -28,7 +28,7 @@ class KafkaReaderCoordinator(mat: Materializer, config: Config) extends Actor wi
   }
 
   override def receive: Receive = LoggingReceive {
-    case _ =>
+    case msg => unhandled(msg)
   }
 
   def initReader(): Unit = {

@@ -32,9 +32,7 @@ class KafkaWriterCoordinator(mat: Materializer, config: Config) extends Actor wi
   }
 
   override def receive: Receive = LoggingReceive {
-    case "Stop" =>
-      log.debug("Stopping the writer coordinator")
-      maybeKafkaProducer.foreach(actor => actor ! OnComplete)
+    case msg => unhandled(msg)
   }
 
   def initWriter(): Unit = {
@@ -56,6 +54,12 @@ class KafkaWriterCoordinator(mat: Materializer, config: Config) extends Actor wi
     // Start the stream
     val publisher: Publisher[CurrencyRateUpdated] = ActorPublisher[CurrencyRateUpdated](generatorActor)
     Source(publisher).runWith(Sink(ActorSubscriber[CurrencyRateUpdated](kafkaProducer)))
+  }
+
+  override def postStop(): Unit = {
+    log.debug("Stopping the writer coordinator")
+    maybeKafkaProducer.foreach(actor => actor ! OnComplete)
+    super.postStop()
   }
 
 }
