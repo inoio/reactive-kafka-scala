@@ -1,6 +1,7 @@
 package sample
 package reactivekafka
 
+import org.apache.kafka.common.serialization.Deserializer
 import play.api.libs.json._
 import kafka.serializer._
 
@@ -24,4 +25,9 @@ object Encoder extends EncoderInstances {
 
 object Decoder extends DecoderInstances {
   def apply[A](implicit D: Decoder[A]): Decoder[A] = D
+  def apply[A](topic: String, deserializer: Deserializer[A]): Decoder[A] = new Decoder[A] {
+    override def fromBytes(bytes: Array[Byte]): A = {
+      deserializer.deserialize(topic, bytes)
+    }
+  }
 }
