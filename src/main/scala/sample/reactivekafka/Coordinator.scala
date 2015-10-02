@@ -66,7 +66,6 @@ class Coordinator(config: Config) extends Actor with ActorLogging {
     case "Shutdown" =>
       log.debug("Shutting down the app")
       context.system.shutdown()
-      context.system.awaitTermination()
   }
 }
 

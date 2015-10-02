@@ -57,6 +57,7 @@ class KafkaReaderCoordinator(mat: Materializer, config: Config) extends Actor wi
 
   def processMessage(msg: MessageAndMetadata[Array[Byte], CurrencyRateUpdated]) = {
     val pairAndRate = msg.message()
+    log.info(s"Partition: ${msg.partition}")
     log.info(s"Offset: ${msg.offset}")
     log.info(s"Msg   : ${pairAndRate}")
     msg
