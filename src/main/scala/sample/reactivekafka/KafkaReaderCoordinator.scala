@@ -34,16 +34,19 @@ class KafkaReaderCoordinator(mat: Materializer, config: Config) extends Actor wi
   def initReader(): Unit = {
     log.debug("initReader")
     implicit val actorSystem = context.system
-    consumerWithOffsetSink = new ReactiveKafka().consumeWithOffsetSink(ConsumerProperties(
+    val consumerProperties = (ConsumerProperties(
       brokerList = config.kafkaIp,
       zooKeeperHost = config.zkIp,
       topic = config.topic,
       groupId = config.group,
       decoder = Decoder.decoder[CurrencyRateUpdated]
-    )
-      .kafkaOffsetsStorage()
-      .commitInterval(100 milliseconds)
-      .readFromEndOfStream())
+    ).kafkaOffsetsStorage()
+      .commitInterval(100.milliseconds)
+      .readFromEndOfStream()
+      .setProperties(config.props.toList: _*))
+    log.info("ConsumerProperies:")
+    log.info(consumerProperties.dump)
+    consumerWithOffsetSink = new ReactiveKafka().consumeWithOffsetSink(consumerProperties)
     log.debug("Starting the reader")
     Source(consumerWithOffsetSink.publisher)
       .map(processMessage)

@@ -13,6 +13,7 @@ trait CommandLineParser {
     opt[String]("group") text ("group") action { (g, config) => config.copy(group = g) }
     opt[Mode]("mode") text ("mode") action { (m, config) => config.copy(mode = m) }
     opt[String]("msg") text ("msg to send to the Coordinator") action { (m, config) => config.copy(msg = m) }
+    opt[Map[String, String]]("props") text ("additional config props") action { (p, config) => config.copy(props = p) }
     help("help")
 
     note(
@@ -45,7 +46,8 @@ case class Config(
     topic: String = java.util.UUID.randomUUID().toString,
     group: String = "group",
     mode: Mode = Mode.readwrite,
-    msg: String = "Start"
+    msg: String = "Start",
+    props: Map[String, String] = Map.empty
 ) {
   override def toString(): String = s"""
   | Config:
@@ -55,5 +57,6 @@ case class Config(
   |   group     : $group
   |   mode      : $mode
   |   msg       : $msg
+  |   props     : ${props.map { case (k, v) => s"$k=$v" }.mkString(",")}
   """.stripMargin
 }
