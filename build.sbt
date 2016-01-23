@@ -15,6 +15,7 @@ libraryDependencies ++= Seq(
   "com.softwaremill.reactivekafka" %% "reactive-kafka-core" % "0.8.1",
   "com.typesafe.play" %% "play-json" % "2.4.3",
   "com.github.scopt" %% "scopt" % "3.3.0",
+  "org.scala-lang.modules" % "scala-async_2.11" % "0.9.5",
   "ch.qos.logback" % "logback-classic" % "1.1.3",
   "org.slf4j" % "log4j-over-slf4j" % "1.7.12",
   "com.typesafe.akka" %% "akka-slf4j" % "2.3.12",
