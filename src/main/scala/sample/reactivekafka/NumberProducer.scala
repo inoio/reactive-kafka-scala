@@ -8,8 +8,8 @@ import org.apache.kafka.clients.producer._
 import scala.collection.JavaConversions._
 
 /**
- * Responsible for starting the writing stream.
- */
+  * Responsible for starting the writing stream.
+  */
 class NumberProducer(config: Config, numMessages: Int = 30) extends Actor with ActorLogging {
 
   override def supervisorStrategy: SupervisorStrategy = OneForOneStrategy() {
@@ -42,10 +42,12 @@ class NumberProducer(config: Config, numMessages: Int = 30) extends Actor with A
       val message = new ProducerRecord[String, Long](config.topic, null, messageNum)
       val future = producer.send(message, new Callback {
         override def onCompletion(metadata: RecordMetadata, exception: Exception): Unit = {
-          if (metadata != null) {
+          val maybeMetadata = Option(metadata)
+          val maybeException = Option(exception)
+          if (maybeMetadata.isDefined) {
             log.info(s"$messageNum onCompletion offset ${metadata.offset()}, partition ${metadata.partition()}")
           }
-          if (exception != null) {
+          if (maybeException.isDefined) {
             log.error(exception, s"$messageNum onCompletion received error")
           }
         }
