@@ -5,7 +5,8 @@ import java.util.Properties
 import akka.actor.SupervisorStrategy.{ Escalate, Resume }
 import akka.actor._
 import akka.event.LoggingReceive
-
+import scala.async.Async._
+import scala.concurrent.ExecutionContext.Implicits.global
 import kafka.consumer.{ ConsumerConnector, ConsumerConfig, KafkaStream }
 import kafka.message.MessageAndMetadata
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -54,9 +55,11 @@ class NumberConsumer(config: Config) extends Actor with ActorLogging {
     }
     case Consume(kafkaStream) =>
       log.info(s"Handling KafkaStream ${kafkaStream.clientId}")
-      kafkaStream.iterator().foreach {
-        case (msg: MessageAndMetadata[String, Long]) =>
-          log.info(s"KafkaStream ${kafkaStream.clientId} received offset ${msg.offset}, partition ${msg.partition}, value: ${msg.message()}")
+      async{
+        kafkaStream.iterator().foreach {
+          case (msg: MessageAndMetadata[String, Long]) =>
+            log.info(s"KafkaStream ${kafkaStream.clientId} received offset ${msg.offset}, partition ${msg.partition}, value: ${msg.message()}")
+        }
       }
   }
 
